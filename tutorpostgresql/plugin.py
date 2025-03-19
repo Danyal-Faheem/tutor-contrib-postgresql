@@ -22,8 +22,13 @@ config = {
     },
     "overrides": {
         #  Running MYSQL in parallel with PostgreSQL for development.
-        # "RUN_POSTGRESQL": False # Disable PostgreSQL
-        # "RUN_MYSQL": False # Disable MySQL
+        # "RUN_POSTGRESQL": False, # Disable PostgreSQL
+        # "RUN_MYSQL": False, # Disable MySQL
+        
+        # TODO: We need to override these settings as the lms, cms init jobs require them to be set to run
+        # A problem that arises is how do we go back to older non-default values on plugin disable?
+        # "MYSQL_HOST": "{{ POSTGRESQL_HOST }}",
+        # "MYSQL_PORT": "{{ POSTGRESQL_PORT }}",
     },
     "unique": {
         "ROOT_PASSWORD": "{{ 8|random_string }}",
@@ -66,6 +71,9 @@ hooks.Filters.CONFIG_OVERRIDES.add_items(
         *list(config.get("overrides", {}).items())
     ]
 )
+
+# Remove the MySQL init job
+# hooks.Filters.CLI_DO_INIT_TASKS.clear(context="app:mysql")
 
 ########################################
 # INITIALIZATION TASKS
