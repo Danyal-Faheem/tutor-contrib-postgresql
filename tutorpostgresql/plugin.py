@@ -10,7 +10,7 @@ from .__about__ import __version__
 ########################################
 # CONFIGURATION
 ########################################
-config = {
+config: dict[str, dict[str, str | int]] = {
     "defaults": {
         "VERSION": __version__,
         "IMAGE": "postgres:14-alpine",
@@ -24,7 +24,6 @@ config = {
         #  Running MYSQL in parallel with PostgreSQL for development.
         # "RUN_POSTGRESQL": False, # Disable PostgreSQL
         # "RUN_MYSQL": False, # Disable MySQL
-        
         # TODO: We need to override these settings as the lms, cms init jobs require them to be set to run
         # A problem that arises is how do we go back to older non-default values on plugin disable?
         # "MYSQL_HOST": "{{ POSTGRESQL_HOST }}",
@@ -102,7 +101,9 @@ for service, template_path in MY_INIT_TASKS:
     with open(full_path, encoding="utf-8") as init_task_file:
         init_task: str = init_task_file.read()
     # Raise the priority of the init job so that the DB is initialized before the migrations are applied
-    hooks.Filters.CLI_DO_INIT_TASKS.add_item((service, init_task), priority=hooks.priorities.HIGH)
+    hooks.Filters.CLI_DO_INIT_TASKS.add_item(
+        (service, init_task), priority=hooks.priorities.HIGH
+    )
 
 ########################################
 # DOCKER IMAGE MANAGEMENT
